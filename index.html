@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An interactive 3D coin component with custom logo and text, featuring hover, click-to-flip, and ripple effects.">
+    <title>3D Interactive Commemorative Coin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-gradient-start: #173A7A;
+            --bg-gradient-mid: #173A7A;
+            --bg-gradient-end: #173A7A;
+
+            --coin-gradient-start: #173A7A;
+            --coin-gradient-end: #66B7E1;
+            
+            --coin-edge-color: #6c7aa1;
+            --coin-border-color: #b0b0b0;
+            --coin-fill-color: #dcdcdc;
+
+            --text-color-light: #ffffff;
+            --text-color-dark: #173A7A;
+            --text-color-accent-blue: #2563eb;
+            --text-color-accent-gold: #ffd700;
+            --text-shadow-color: rgba(0,0,0,0.7);
+
+            --inner-content-bg-light: #f5f5f5;
+            --inner-content-bg-dark: #ffffff;
+            --inner-content-border: #bfc6d1;
+
+            --shadow-base-dark: rgba(0,0,0,0.3);
+            --shadow-base-light: rgba(0,0,0,0.25);
+            --shadow-hover-dark: rgba(0,0,0,0.4);
+            --shadow-hover-blue-light: rgba(56,189,248,0.7);
+            --shadow-hover-blue-mid: rgba(56,189,248,0.6);
+            --shadow-hover-blue-dark: rgba(37, 99, 235, 0.7);
+            --shadow-gold: rgba(255,215,0,0.9);
+
+            --ripple-color: rgba(56, 189, 248, 0.6);
+            
+            --star-color-default: var(--text-color-light);
+            --star-color-hover: var(--text-color-accent-gold);
+
+            --flip-duration: 2.8s;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(45deg, var(--bg-gradient-start), var(--bg-gradient-mid), var(--bg-gradient-end));
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            perspective: 1200px;
+        }
+        
+        .scene {
+            width: 90vw;              
+            max-width: 380px;         
+            aspect-ratio: 1 / 1;     
+            perspective: 1000px;
+            cursor: pointer;
+            animation: badgePulse 3s infinite ease-in-out;
+            margin: 0 auto;
+        }
+
+        .coin {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform var(--flip-duration) ease-in-out;
+            transform-origin: center center;
+            cursor: pointer;
+        }
+        
+      .coin:hover .coin-edge {
+          background: linear-gradient(90deg, 
+              #999 0%, 
+              #777 20%, 
+              #555 50%, 
+              #777 80%, 
+              #999 100%);
+          box-shadow: 
+              inset 0 0 20px rgba(0,0,0,0.6),
+              0 0 15px rgba(56,189,248,0.3);
+          transition: all 0.3s ease;
+      }
+
+        .coin.is-flipped {
+            transform: rotateY(180deg) !important;
+        }
+        
+        .coin-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: transparent; 
+        }
+        
+        .coin-front {
+            transform: rotateY(0deg);
+            z-index: 10;
+        }
+        
+        .coin-back {
+            transform: rotateY(180deg);
+            z-index: 10;
+        }
+        
+        .coin-edge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transform-style: preserve-3d;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255,255,255,0.1) 10%,
+                rgba(0,0,0,0.3) 20%,
+                rgba(0,0,0,0.5) 50%,
+                rgba(0,0,0,0.3) 80%,
+                rgba(255,255,255,0.1) 90%,
+                transparent 100%);
+            box-shadow: 
+                inset 0 0 20px rgba(0,0,0,0.8),
+                0 0 15px rgba(0,0,0,0.4);
+            border: 2px solid #333;
+        }
+        
+        .badge-container {
+            width: 90%;               
+            aspect-ratio: 1 / 1;
+            position: relative;
+            perspective: 2000px;
+            transform-style: preserve-3d;
+            margin: auto;
+        }
+        
+        .badge-svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            overflow: visible;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .curved-text-top {
+            font-size:40px;
+            font-weight:800;
+            letter-spacing:6px;
+            font-family: 'Inter', 'Arial Black', sans-serif;
+            fill:var(--text-color-light);
+            text-anchor:middle;
+            text-shadow:
+                1px 1px 0 var(--text-shadow-color),
+                2px 2px 0 var(--text-shadow-color),
+                4px 4px 0 var(--text-shadow-color),
+                6px 6px 1px rgba(0,0,0,0.5);
+            transition: all 0.5s ease;
+        }
+        
+        .curved-stars-bottom {
+            font-size:22px;
+            fill:var(--text-color-light);
+            text-anchor:middle;
+            letter-spacing:9px;
+            text-shadow: 
+                1px 1px 2px var(--text-shadow-color),
+                0 0 5px var(--shadow-gold);
+            transition: all 0.5s ease;
+        }
+        
+        .star {
+            animation: starPulse 4s infinite;
+            transform: translateZ(55px);
+            text-shadow:
+                3px 3px 6px var(--text-shadow-color),
+                0 0 16px var(--shadow-gold);
+            transition: all 0.5s ease;
+        }
+        @keyframes starPulse {
+          0%,100% { fill:var(--star-color-default); transform:scale(1);}
+          50% { fill:var(--star-color-hover); transform:scale(1.3);}
+        }
+        
+        .inner-content-wrapper {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) translateZ(10px);
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, var(--inner-content-bg-light), var(--inner-content-bg-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                inset 0 5px 12px var(--shadow-base-light),
+                0 7px 22px var(--shadow-base-dark);
+            z-index: 2;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.175,0.885,0.32,1.275),
+                        box-shadow 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+        }
+        
+        .inner-content {
+            width:232px;
+            height:232px;
+            border-radius:50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid var(--inner-content-border);
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.175,0.885,0.32,1.275),
+                        box-shadow 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+            background: #fff; 
+            box-shadow: 
+                inset 0 0 25px rgba(0, 0, 0, 0.1),
+                0 10px 30px var(--shadow-base-dark),
+                0 15px 35px rgba(56, 189, 248, 0.2);
+        }
+        
+        .twenty {
+            font-family: 'Montserrat', 'Arial Black', sans-serif;
+            font-size:6rem;
+            font-weight: 800;
+            color: var(--text-color-dark);
+            margin-top: -30px;
+            margin-bottom: -25px;
+            text-shadow: 2px 2px var(--text-color-light), 4px 4px #ddd, 6px 6px 8px rgba(0,0,0,.35);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.975);
+            transform-style: preserve-3d;
+            transform: translateZ(50px);
+        }
+        
+        .years {
+            font-size: 2.5rem;
+            font-family: 'Montserrat', 'Arial Black', sans-serif;
+            margin-bottom: -7px;
+            font-weight: 800;
+            color: var(--text-color-dark);
+            margin-top: -14px;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            text-shadow:
+                1px 1px 0 #fff,
+                2px 2px 0 #ddd,
+                3px 3px 0 #ccc,
+                2px 2px 2px rgba(0,0,0,0.1);
+            transform: translateZ(30px);
+        }
+        
+        .location {
+            font-size:1.2rem;
+            font-family: 'Montserrat', 'Arial Black', sans-serif;
+            font-weight:800;
+            color: var(--text-color-dark);
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 1.2;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            text-shadow: 
+                1px 1px 0 #fff,
+                2px 2px 0 #ddd,
+                3px 3px 0 #ccc,
+                2px 2px 2px rgba(0,0,0,0.1);
+            transform: translateZ(15px);
+        }
+
+        .back-seal-image {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+            transform: translateZ(20px);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(3px 3px 5px var(--shadow-base-dark));
+        }
+        
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            opacity: 0;
+            animation: sparkle 3s infinite;
+        }
+        
+        @keyframes sparkle {
+            0% {
+                opacity: 0;
+                transform: translateY(0) rotate(0deg);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-30px) rotate(360deg);
+            }
+        }
+
+
+        @keyframes innerGradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+
+        .click-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--ripple-color) 0%, transparent 70%);
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        @keyframes clickRipple {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes badgePulse {
+            0%   { transform: scale(1); }
+            25%  { transform: scale(1.015); }
+            50%  { transform: scale(1.03); }
+            75%  { transform: scale(1.015); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 768px) {
+            .scene {
+                width: 85vw;
+                max-width: 320px;
+            }
+            
+            .curved-text-top {
+                font-size: 32px !important;
+                letter-spacing: 3px !important;
+            }
+            
+            .curved-stars-bottom {
+                font-size: 16px !important;
+                letter-spacing: 6px !important;
+            }
+            
+            .twenty {
+                font-size: 4.5rem !important;
+                margin-top: -20px !important;
+                margin-bottom: -15px !important;
+            }
+            
+            .years {
+                font-size: 2rem !important;
+                margin-bottom: -5px !important;
+                margin-top: -10px !important;
+            }
+            
+            .location {
+                font-size: 0.9rem !important;
+            }
+            
+            .inner-content-wrapper {
+                width: 180px !important;
+                height: 180px !important;
+            }
+            
+            .inner-content {
+                width: 190px !important;
+                height: 190px !important;
+            }
+            
+            .badge-container {
+                width: 90% !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .scene {
+                width: 80vw;
+                max-width: 280px;
+            }
+            
+            .curved-text-top {
+                font-size: 26px !important;
+                letter-spacing: 2px !important;
+            }
+            
+            .curved-stars-bottom {
+                font-size: 14px !important;
+                letter-spacing: 4px !important;
+            }
+            
+            .twenty {
+                font-size: 3.5rem !important;
+                margin-top: -15px !important;
+                margin-bottom: -10px !important;
+            }
+            
+            .years {
+                font-size: 1.6rem !important;
+                margin-bottom: -3px !important;
+                margin-top: -8px !important;
+            }
+            
+            .location {
+                font-size: 0.8rem !important;
+            }
+            
+            .inner-content-wrapper {
+                width: 150px !important;
+                height: 150px !important;
+            }
+            
+            .inner-content {
+                width: 160px !important;
+                height: 160px !important;
+            }
+            
+            .badge-container {
+                width: 95% !important;
+            }
+        }
+    </style>
+    </style>
+</head>
+<body>
+    <div class="scene" id="scene" role="img" aria-label="Interactive 3D Commemorative Coin">
+        <div class="coin" id="coin">
+            <!-- Coin Front -->
+            <div class="coin-face coin-front">
+                <div class="badge-container">
+                    <div class="particles" id="particles-front" aria-hidden="true"></div>
+                    <svg class="badge-svg" viewBox="0 0 380 380" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <defs>
+                            <path id="circle-top-front" d="M 28,190 A 162,162 0 0,1 352,190" />
+                            <path id="circle-bottom-front" d="M 352,190 A 138,138 0 0,1 28,190" />
+                            <!-- Updated linearGradient to go from top (y1=0%) to bottom (y2=100%) -->
+                            <linearGradient id="badgeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <!-- Top → Center -->
+                                <stop offset="0%" stop-color="var(--coin-gradient-start)" />
+                                <stop offset="63.4%" stop-color="var(--coin-gradient-start)" />
+                                <!-- Bottom → Center -->
+                                <stop offset="63.4%" stop-color="var(--coin-gradient-end)" />
+                                <stop offset="100%" stop-color="var(--coin-gradient-end)" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- outer coin -->
+                        <circle cx="190" cy="190" r="195" fill="var(--coin-fill-color)" stroke="var(--coin-border-color)" stroke-width="35"></circle>
+                        <circle cx="190" cy="190" r="204" fill="url(#badgeGradient)" stroke="white" stroke-width="10"></circle>
+
+                        <svg id="arrowDividerLeftFront" width="100" height="300" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="rotate(-18, 42, 262)">
+                                <!-- Filled V -->
+                                <path d="M -11 229 L 42 271 L 93 252 Z" fill="#173A7A" stroke="#173A7A"/>
+                                <!-- Left & Right strokes as single path to avoid gap -->
+                                <path d="M -2 232 L 43 271 L 83 252" fill="none" stroke="white" stroke-width="9" stroke-linejoin="miter" stroke-linecap="butt"/>
+                                <!-- Top stroke -->
+                                <line x1="1" y1="252" x2="83" y2="252" stroke="none" stroke-width="9" stroke-linecap="butt"/>
+                            </g>
+                        </svg>
+
+                        <svg id="arrowDividerRightFront" width="380" height="380" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(380,0) scale(-1,1) rotate(-18, 42, 262)">
+                                <!-- Filled V -->
+                                <path d="M -11 229 L 42 271 L 93 252 Z" fill="#173A7A" stroke="#173A7A"/>
+                                <!-- Left & Right strokes as single path to avoid gap -->
+                                <path d="M -2 232 L 43 271 L 83 252" fill="none" stroke="white" stroke-width="9" stroke-linejoin="miter" stroke-linecap="butt"/>
+                                <!-- Top stroke -->
+                                <line x1="1" y1="252" x2="83" y2="252" stroke="none" stroke-width="9" stroke-linecap="butt"/>
+                            </g>
+                        </svg>
+
+                        <!-- top text -->
+                        <text id="topTextFrontSVG" class="curved-text-top" dy="17">
+                            <textPath id="topTextPathFront" href="#circle-top-front" startOffset="50%">
+                                20 YEARS ORLANDO & SURROUNDING CITIES
+                            </textPath>
+                        </text>
+
+                        <!-- bottom stars -->
+                        <text class="curved-stars-bottom" dy="4">
+                            <textPath href="#circle-bottom-front" startOffset="50%">
+                                <tspan class="star">★</tspan>
+                                <tspan class="star">★</tspan>
+                                <tspan class="star">★</tspan>
+                                <tspan class="star">★</tspan>
+                                <tspan class="star">★</tspan>
+                            </textPath>
+                        </text>
+                    </svg>
+
+                    <div class="inner-content-wrapper">
+                        <div class="inner-content">
+                            <div class="click-effect" aria-hidden="true"></div>
+                            <div class="twenty" aria-live="polite" aria-label="20 years">20</div>
+                            <div class="years">YEARS</div>
+                            <div class="location">
+                                <span>ORLANDO &<br></span>
+                                <span>SURROUNDING<br></span>
+                                <span>CITIES</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coin Back - Updated to match front -->
+            <div class="coin-face coin-back">
+                <div class="badge-container">
+                    <div class="particles" id="particles-back" aria-hidden="true"></div>
+                    <svg class="badge-svg" viewBox="0 0 380 380" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <defs>
+                            <path id="circle-top-back" d="M 28,190 A 162,162 0 0,1 352,190" />
+                            <path id="circle-bottom-back" d="M 352,190 A 138,138 0 0,1 28,190" />
+                            <!-- Updated linearGradient to go from top (y1=0%) to bottom (y2=100%) -->
+                            <linearGradient id="badgeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <!-- Top → Center -->
+                                <stop offset="0%" stop-color="var(--coin-gradient-start)" />
+                                <stop offset="63.4%" stop-color="var(--coin-gradient-start)" />
+                                <!-- Bottom → Center -->
+                                <stop offset="63.4%" stop-color="var(--coin-gradient-end)" />
+                                <stop offset="100%" stop-color="var(--coin-gradient-end)" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- outer coin -->
+                        <circle cx="190" cy="190" r="190" fill="var(--coin-fill-color)" stroke="var(--coin-border-color)" stroke-width="3"></circle>
+                        <circle cx="190" cy="190" r="204" fill="url(#badgeGradient)" stroke="white" stroke-width="10"></circle>
+
+                        <svg id="arrowDividerLeftBack" width="100" height="300" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="rotate(-18, 42, 262)">
+                                <!-- Filled V -->
+                                <path d="M -11 229 L 42 271 L 93 252 Z" fill="#173A7A" stroke="#173A7A"/>
+                                <!-- Left & Right strokes as single path to avoid gap -->
+                                <path d="M -2 232 L 43 271 L 83 252" fill="none" stroke="white" stroke-width="9" stroke-linejoin="miter" stroke-linecap="butt"/>
+                                <!-- Top stroke -->
+                                <line x1="1" y1="252" x2="83" y2="252" stroke="none" stroke-width="9" stroke-linecap="butt"/>
+                            </g>
+                        </svg>
+
+                        <svg id="arrowDividerRightBack" width="380" height="380" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(380,0) scale(-1,1) rotate(-18, 42, 262)">
+                                <!-- Filled V -->
+                                <path d="M -11 229 L 42 271 L 93 252 Z" fill="#173A7A" stroke="#173A7A"/>
+                                <!-- Left & Right strokes as single path to avoid gap -->
+                                <path d="M -2 232 L 43 271 L 83 252" fill="none" stroke="white" stroke-width="9" stroke-linejoin="miter" stroke-linecap="butt"/>
+                                <!-- Top stroke -->
+                                <line x1="1" y1="252" x2="83" y2="252" stroke="none" stroke-width="9" stroke-linecap="butt"/>
+                            </g>
+                        </svg>
+                        <!-- Curved text for back - same as front -->
+                        <text id="topTextBackSVG" class="curved-text-top" dy="17">
+                            <textPath id="topTextPathBack" href="#circle-top-back" startOffset="50%">
+                                20 YEARS ORLANDO & SURROUNDING CITIES
+                            </textPath>
+                        </text>
+                        <text class="curved-stars-bottom" dy="7">
+                            <textPath href="#circle-bottom-back" startOffset="50%">
+                                <tspan class="star">★</tspan>
+                                <tspan class="star">★</tspan>
+                                <tspan class="star">★</tspan>
+                                <tspan class="star">★</tspan>
+                                <tspan class="star">★</tspan>
+                            </textPath>
+                        </text>
+                    </svg>
+                    <div class="inner-content-wrapper">
+                        <div class="inner-content">
+                            <div class="click-effect" aria-hidden="true"></div>
+                            <div class="twenty" aria-live="polite" aria-label="20 years">20</div>
+                            <div class="years">YEARS</div>
+                            <div class="location">
+                                <span>ORLANDO &<br></span>
+                                <span>SURROUNDING<br></span>
+                                <span>CITIES</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const coin = document.getElementById('coin');
+            const scene = document.getElementById('scene');
+            let isHovering = false; 
+
+            const pathFront = document.getElementById('circle-top-front');
+            const textPathFront = document.getElementById('topTextPathFront');
+
+            const pathBack = document.getElementById('circle-top-back');
+            const textPathBack = document.getElementById('topTextPathBack');
+              
+            function countUp(el, target, duration) {
+                const startTime = performance.now();
+
+                function update(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const current = Math.floor(progress * target);
+                    el.textContent = current;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(update);
+                    } else {
+                        el.textContent = target; 
+                    }
+                }
+                requestAnimationFrame(update);
+            }
+
+            function fitTextToArc(pathElement, textPathElement){
+                if (!pathElement || !textPathElement) return;
+                const pathLen = pathElement.getTotalLength();
+                const padding = 5; 
+                const available = pathLen + padding;
+                textPathElement.setAttribute('lengthAdjust','spacingAndGlyphs');
+                textPathElement.setAttribute('textLength',available.toFixed(1));
+            }
+            
+            window.addEventListener('load', () => {
+                fitTextToArc(pathFront, textPathFront);
+                fitTextToArc(pathBack, textPathBack); 
+                const num=document.querySelector('.twenty');
+                countUp(num,20,1500);
+            });
+            window.addEventListener('resize', () => {
+                fitTextToArc(pathFront, textPathFront);
+                fitTextToArc(pathBack, textPathBack); 
+            });
+
+            function createParticles(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                for (let i = 0; i < 10; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+
+                    const size = Math.random() * 4 + 1;
+                    const posX = Math.random() * 100;
+                    const posY = Math.random() * 100;
+                    const delay = Math.random() * 5;
+                    const duration = Math.random() * 2 + 2;
+
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${posX}%`;
+                    particle.style.top = `${posY}%`;
+                    particle.style.animationDelay = `${delay}s`;
+                    particle.style.animationDuration = `${duration}s`;
+
+                    container.appendChild(particle);
+                }
+            }
+
+            createParticles('particles-front');
+            createParticles('particles-back');
+
+            scene.addEventListener('mousemove', function(e) {
+                if (!isHovering || coin.classList.contains('is-flipped')) {
+                    return;
+                }
+                
+                const rect = scene.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                const relX = (x - centerX) / centerX;
+                const relY = (y - centerY) / centerY;
+
+                const rotateX = relY * 30; 
+                const rotateY = relX * 30; 
+
+                coin.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            scene.addEventListener('mouseenter', function(e) {
+                isHovering = true;
+
+                const rect = scene.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                const relX = (x - centerX) / centerX;
+                const relY = (y - centerY) / centerY;
+
+                const rotateX = relY * 30;
+                const rotateY = relX * 30; 
+
+                coin.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            scene.addEventListener('mouseleave', function() {
+                isHovering = false;
+                if (!coin.classList.contains('is-flipped')) {
+                    coin.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                }
+            });
+
+            scene.addEventListener('click', function(e) {
+                const clickEffect = document.createElement('div');
+                clickEffect.classList.add('click-effect');
+                
+                const rect = scene.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                clickEffect.style.left = `${x}px`;
+                clickEffect.style.top = `${y}px`;
+                
+                scene.appendChild(clickEffect);
+                
+                setTimeout(() => {
+                    clickEffect.style.animation = 'clickRipple 0.8s forwards';
+                }, 10);
+                
+                setTimeout(() => {
+                    scene.removeChild(clickEffect);
+                }, 800);
+
+                const flipDuration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--flip-duration'));
+                
+                coin.style.transform = ''; 
+                coin.classList.toggle('is-flipped'); 
+
+                isHovering = false; 
+                setTimeout(() => {
+                    isHovering = true; 
+                }, flipDuration * 1000); 
+            });
+            
+            function buildCoinEdges(coinSelector, edgeCount = 60, step = 1.2) { // Increased count and step
+                const coinElement = document.querySelector(coinSelector);
+                if (!coinElement) return;
+
+                coinElement.querySelectorAll('.coin-edge').forEach(edge => edge.remove());
+
+                for (let i = 0; i < edgeCount; i++) {
+                    const edge = document.createElement('div');
+                    edge.classList.add('coin-edge');
+
+                    if (i % 3 === 0) {
+                        edge.style.background = 'linear-gradient(90deg, #777 0%, #555 50%, #777 100%)';
+                    } else if (i % 3 === 1) {
+                        edge.style.background = 'linear-gradient(90deg, #666 0%, #444 50%, #666 100%)';
+                    } else {
+                        edge.style.background = 'linear-gradient(90deg, #777 0%, #555 50%, #777 100%)';
+                    }
+
+                    edge.style.boxShadow = 'inset 0 0 8px rgba(0,0,0,0.7)';
+                    edge.style.border = '1px solid #444';
+
+                    const offset = (i - edgeCount / 2) * step;
+                    edge.style.transform = `translateZ(${offset}px)`;
+
+                    coinElement.appendChild(edge);
+                }
+
+                const maxOffset = (edgeCount / 2) * step;
+                const front = coinElement.querySelector('.coin-front');
+                const back = coinElement.querySelector('.coin-back');
+
+                if (front) front.style.transform = `rotateY(0deg) translateZ(${maxOffset}px)`;
+                if (back) back.style.transform = `rotateY(180deg) translateZ(${maxOffset}px)`;
+            }
+
+            buildCoinEdges('.coin', 24, 1.2); 
+
+        });
+    </script>
+</body>
+</html>
