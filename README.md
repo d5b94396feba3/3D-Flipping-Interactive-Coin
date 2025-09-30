@@ -1,4 +1,4 @@
-#3D Interactive Flipping Coin
+3D Interactive Flipping Coin
 
 🚀 Learn how to build an interactive 3D flipping coin with just HTML, CSS, and JavaScript! ✨
 
