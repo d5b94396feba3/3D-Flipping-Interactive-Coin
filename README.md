@@ -1,3 +1,3 @@
-# 3D Flipping Interactive Coin built using html, css, svg, and js.
+# 3D Interactive Flipping Coin – Built using HTML, CSS, SVG, and JavaScript.
 
  [Live Demo on CodePen](https://codepen.io/Shahibur-Rahman/pen/zxrqpGz)
