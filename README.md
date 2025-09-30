@@ -14,6 +14,6 @@ Features
 
 Demo & Guide
 
-Article: [Dev.to Guide](https://codepen.io/Shahibur-Rahman/pen/zxrqpGz)
+Article: [Dev.to Guide]([https://codepen.io/Shahibur-Rahman/pen/zxrqpGz](https://dev.to/shahibur_rahman_6670cd024/build-a-3d-flipping-coin-with-html-css-javascript-deep-dive-26h2))
 
 Live Demo: [CodePen](https://codepen.io/Shahibur-Rahman/pen/zxrqpGz)
