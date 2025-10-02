@@ -1,19 +1,23 @@
-3D Interactive Flipping Coin
+# 3D Interactive Flipping Coin
 
 🚀 Learn how to build an interactive 3D flipping coin with just HTML, CSS, and JavaScript! ✨
 
-Features
+## Features
 
-💡 Curved SVG text
+- 💡 Curved SVG text
+- 💡 Realistic stacked edges  
+- 💡 Hover tilt + click ripple
+- 💡 Responsive & accessible
 
-💡 Realistic stacked edges
+## Demo & Guide
 
-💡 Hover tilt + click ripple
+**Article:** [Dev.to Guide](https://dev.to/shahibur_rahman_6670cd024/build-a-3d-flipping-coin-with-html-css-javascript-deep-dive-26h2)  
+**Live Demo:** [CodePen](https://codepen.io/Shahibur-Rahman/pen/zxrqpGz)
 
-💡 Responsive & accessible
+## Quick Start
 
-Demo & Guide
+Simply open `index.html` in your browser to see the coin in action!
 
-Article: [Dev.to Guide](https://dev.to/shahibur_rahman_6670cd024/build-a-3d-flipping-coin-with-html-css-javascript-deep-dive-26h2)
+---
 
-Live Demo: [CodePen](https://codepen.io/Shahibur-Rahman/pen/zxrqpGz)
+⭐ **Star this repo if you find it helpful!**
